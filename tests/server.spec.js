@@ -1,6 +1,7 @@
 import request from "supertest";
 import app from "../server.js";
 import { faker } from "@faker-js/faker";
+import { generateToken } from "./utils/login.js";
 
 describe("Coffees CRUD operations", () => {
     describe("GET /coffees", () => {
@@ -23,8 +24,8 @@ describe("Coffees CRUD operations", () => {
         });
 
         it("Should respond with a 404 code status when using an invalid id", async () => {
-            const id = faker.string.alphanumeric();
-            const response = await request(app).get(`/coffees/${id}`);
+            const invalidId = faker.string.alphanumeric();
+            const response = await request(app).get(`/coffees/${invalidId}`);
             expect(response.status).toBe(404);
         });
     });
@@ -70,6 +71,14 @@ describe("Coffees CRUD operations", () => {
     });
 
     describe("DELETE /coffees/:id", () => {
-        it("Should ")
-    })
+        it("Should respond with a 404 code status for an inexisting id", async () => {
+            const invalidId = faker.string.alphanumeric();
+            const token = generateToken();
+            const response = await request(app)
+                .delete(`/coffes/${invalidId}`)
+                .set("Authorization", `Bearer ${token}`)
+                .send();
+            expect(response.statusCode).toBe(404);
+        });
+    });
 });
