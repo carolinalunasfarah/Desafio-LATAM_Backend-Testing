@@ -28,4 +28,24 @@ describe("Coffees CRUD operations", () => {
             expect(response.status).toBe(404);
         });
     });
+
+    describe("POST /coffees", () => {
+        it("Should respond with a 201 code status when using valid params", async () => {
+            const payload = {
+                id: faker.string.numeric({ min: 5, max: 999 }),
+                name: faker.commerce.productName(),
+            };
+            const response = await request(app).post("/coffees").send(payload);
+            expect(response.status).toBe(201);
+        });
+
+        it("Should respond with a 400 code status when using and existing id", async () => {
+            const payload = {
+                id: faker.string.numeric({ min: 1, max: 4 }),
+                name: faker.commerce.productName(),
+            };
+            const response = await request(app).post("/coffees").send(payload);
+            expect(response.status).toBe(400);
+        });
+    });
 });
