@@ -1,6 +1,6 @@
 ﻿import { PORT } from "./config/config.js";
 import express from "express";
-import coffees from "./coffees.json" assert { type: "json" };
+import coffees from "./coffees.json";
 
 const app = express();
 
@@ -59,7 +59,7 @@ app.delete("/coffees/:id", (req, res) => {
             console.log(coffeeIndexFound, coffees);
             res.send(coffees);
         } else {
-            res.status(404).send({ message: "Ther's no coffee with this id" });
+            res.status(404).send({ message: "There's no coffee with this id" });
         }
     } else res.status(400).send({ message: "There's no token in the headers" });
 });
