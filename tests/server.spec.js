@@ -48,4 +48,28 @@ describe("Coffees CRUD operations", () => {
             expect(response.status).toBe(400);
         });
     });
+
+    describe("PUT /coffees/:id", () => {
+        it("Should respond with a 400 code status when param id doesn't match with the coffee id", async () => {
+            const invalidId = faker.string.alphanumeric();
+            const updateCoffee = {
+                id: faker.string.numeric(undefined),
+                name: "Updated coffee",
+            };
+            const response = await request(app)
+                .put(`/coffees/${invalidId}`)
+                .send(updateCoffee);
+            expect(response.status).toBe(400);
+        });
+
+        it("Should respond with a 404 code status when there's no coffee with the provided id", async () => {
+            const id = faker.string.alphanumeric();
+            const response = await request(app).get(`/coffees/${id}`);
+            expect(response.status).toBe(404);
+        });
+    });
+
+    describe("DELETE /coffees/:id", () => {
+        it("Should ")
+    })
 });
