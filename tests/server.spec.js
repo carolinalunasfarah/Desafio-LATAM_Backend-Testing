@@ -24,7 +24,7 @@ describe("Coffees CRUD operations", () => {
         });
 
         it("Should respond with a 404 code status when using an invalid id", async () => {
-            const invalidId = faker.string.alphanumeric();
+            const invalidId = faker.string.alpha();
             const response = await request(app).get(`/coffees/${invalidId}`);
             expect(response.status).toBe(404);
         });
@@ -33,16 +33,16 @@ describe("Coffees CRUD operations", () => {
     describe("POST /coffees", () => {
         it("Should respond with a 201 code status when using valid params", async () => {
             const payload = {
-                id: faker.string.numeric({ min: 5, max: 999 }),
+                id: faker.number.int({ min: 5, max: 999 }),
                 name: faker.commerce.productName(),
             };
             const response = await request(app).post("/coffees").send(payload);
             expect(response.status).toBe(201);
         });
 
-        it("Should respond with a 400 code status when using and existing id", async () => {
+        it("Should respond with a 400 code status when using an existing id", async () => {
             const payload = {
-                id: faker.string.numeric({ min: 1, max: 4 }),
+                id: faker.number.int({ min: 1, max: 4 }),
                 name: faker.commerce.productName(),
             };
             const response = await request(app).post("/coffees").send(payload);
@@ -52,7 +52,7 @@ describe("Coffees CRUD operations", () => {
 
     describe("PUT /coffees/:id", () => {
         it("Should respond with a 400 code status when param id doesn't match with the coffee id", async () => {
-            const invalidId = faker.string.alphanumeric();
+            const invalidId = faker.string.alpha();
             const updateCoffee = {
                 id: faker.string.numeric(undefined),
                 name: "Updated coffee",
@@ -64,21 +64,50 @@ describe("Coffees CRUD operations", () => {
         });
 
         it("Should respond with a 404 code status when there's no coffee with the provided id", async () => {
-            const id = faker.string.alphanumeric();
+            const id = faker.string.alpha();
             const response = await request(app).get(`/coffees/${id}`);
             expect(response.status).toBe(404);
         });
     });
 
     describe("DELETE /coffees/:id", () => {
+        it("Erasing a coffee", async () => {
+            const idToErase = 2;
+            const token = generateToken();
+            const { body: coffees } = await request(app)
+                .delete(`/coffees/${idToErase}`)
+                .set("Authorization", `Bearer ${token}`)
+                .send();
+            const ids = coffees.map((c) => c.id);
+            expect(ids).not.toContain(idToErase);
+        });
+
         it("Should respond with a 404 code status for an inexisting id", async () => {
-            const invalidId = faker.string.alphanumeric();
+            const invalidId = faker.string.alpha();
             const token = generateToken();
             const response = await request(app)
-                .delete(`/coffes/${invalidId}`)
+                .delete(`/coffees/${invalidId}`)
                 .set("Authorization", `Bearer ${token}`)
                 .send();
             expect(response.statusCode).toBe(404);
         });
+
+        it("Should respond with a 400 code status using an invalid token", async () => {
+            const payload = {
+                id: 1,
+                name: faker.commerce.productName(),
+            };
+            const response = await request(app)
+                .delete(`/coffees/${payload.id}`)
+                .send(payload)
+            expect(response.statusCode).toBe(400);
+        });
+    });
+});
+
+describe("Not Found operation", () => {
+    it("Should respond with a 404 code when visiting a non existing route", async () => {
+        const response = await request(app).get("/melons").send();
+        expect(response.status).toBe(404);
     });
 });
